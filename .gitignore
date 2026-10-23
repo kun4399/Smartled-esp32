@@ -1,0 +1,16 @@
+/build/
+/private/
+/main/gatt_ltmk_private.h
+/sdkconfig
+/sdkconfig.old
+/managed_components/
+.venv/
+__pycache__/
+*.pyc
+/logs/*
+!/logs/.gitkeep
+*.bin
+*.elf
+*.map
+*.hex
+.DS_Store

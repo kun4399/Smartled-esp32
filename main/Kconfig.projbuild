@@ -1,0 +1,36 @@
+menu "SmartLED discovery"
+    config SMARTLED_SCAN_ALL
+        bool "Log all nearby BLE advertisements"
+        default n
+        help
+            Default logs only advertisements that mention Xiaomi service FE95.
+            Enable this if the target does not advertise FE95.
+
+    config SMARTLED_LOG_RAW_ADV
+        bool "Log raw advertisement bytes"
+        default n
+        help
+            Raw BLE payloads and device identifiers may be sensitive. Keep
+            serial logs private and do not commit captured output.
+endmenu
+
+menu "SmartLED local gateway"
+    config SMARTLED_WIFI_SSID
+        string "2.4 GHz Wi-Fi SSID (stored only in ignored sdkconfig)"
+        default ""
+    config SMARTLED_WIFI_PASSWORD
+        string "Wi-Fi password (stored only in ignored sdkconfig)"
+        default ""
+    config SMARTLED_MQTT_URI
+        string "Local broker URI (mqtt://host:1883)"
+        default ""
+    config SMARTLED_MQTT_USER
+        string "MQTT user"
+        default ""
+    config SMARTLED_MQTT_PASSWORD
+        string "MQTT password (stored only in ignored sdkconfig)"
+        default ""
+    config SMARTLED_MQTT_TOPIC
+        string "Topic prefix shared with X-Knob"
+        default "home"
+endmenu
