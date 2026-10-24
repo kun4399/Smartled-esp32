@@ -10,6 +10,14 @@
 
 ## Next improvements
 
+Always Ready v3 software integration is complete: 30s idle BLE polling matches
+the X-Knob's 90s light-state TTL; immediate command readback is preserved. Host
+tests and firmware compilation have passed. Both images have been flashed and verified, and the user confirmed the revised
+knob switch feel, dark ON/OFF control and press-only wake. Remaining work includes
+press-protection stress cases, reconnection, switch latency optimization and
+three measured twelve-hour runs. Battery/current tests were explicitly deferred
+by the user to a later round.
+
 1. Make BLE reconnection and MQTT state recovery predictable after power or network loss.
 2. Surface command timeout, stale-state, and broker-connection conditions clearly on the knob.
 3. Add repeatable host-side tests for message parsing and command boundaries.

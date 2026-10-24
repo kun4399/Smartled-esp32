@@ -11,6 +11,19 @@ This page records project-level evidence without storing household identifiers, 
 
 ## Build evidence
 
+- 2026-10-24 Always Ready v3 integration: idle BLE readback is now every 30s;
+  command-triggered readback, MIoT authentication and write paths are preserved.
+  ESP-IDF 6.0.1 `esp32` build, C gateway/MIoT tests and 19 Python tests pass.
+  The changed image was flashed after a private 4MB backup and unchanged
+  partition check; all three written segments passed digest verification.
+  Fresh non-retained BLE readback and a matching V1 same-value command ACK/state
+  were observed through the existing local tunnel (one 0.983s sample, not P95).
+  Duplicate ID handling also passed live. The user confirmed the revised knob
+  switch feel, dark direction control and press-only wake. Outage recovery,
+  stress cases and twelve-hour battery life remain unverified. The observed
+  nine switch samples ranged 0.974–1.241s (sample P95 1.241s, excluding physical
+  input processing), so the initial 1s target has not been reached.
+
 - ESP-IDF firmware has built for the `esp32` target.
 - X-Knob firmware has built for `esp32-s3-devkitc-1` using PlatformIO.
 - A successful build confirms compilation only. It does not establish BLE reliability, MQTT reconnect behavior, UI readability, or haptic quality on every board.

@@ -63,13 +63,23 @@ Commands are plain text and are not retained. State is retained by the gateway. 
 
 ## X-Knob interaction
 
-The V4.8 face is the knob's default page. Rotate for brightness, hold the
-button while rotating for color temperature, short-press for power, long-press
-for local scene selection, and double-click for the application menu. Scene
-selection is a preview until a short press applies it. The older **Smart LED**
-page remains in the menu during migration.
+The Always Ready v3 face is the knob's default page. Rotate clockwise for
+absolute ON and counterclockwise for absolute OFF, including in DARK without
+waking the LCD. Short-press enters brightness precision control when the light
+is on; the next short press selects color temperature. Long-press opens local
+scene preview; double-click on Face opens apps. Scene selection is a preview
+until a short press applies it. The separate **Smart LED** app remains.
 
-The V1 gateway protocol passed an ESP-IDF 6.0.1 build and was flashed to the
+Idle BLE polling is 30 seconds; writes retain immediate verification readback.
+The knob uses a 90-second light TTL. It must confirm matching state and command
+ID regardless of ACK arrival order; ACK or publish receipt alone cannot
+confirm. Its old queued/UI intent is dropped on disconnect, timeout or dark
+transition rather than replayed later. This gateway image was flashed after a
+private backup, and a same-value V1 command produced matching BLE readback/ACK;
+the one observed 0.983s sample is not switch latency P95. Duplicate ID handling
+passed live. Dark knob input, reconnection and P95 latency still need testing.
+
+Before this Always Ready change, the V1 protocol passed an ESP-IDF 6.0.1 build and was flashed to the
 confirmed 4 MB ESP32-WROOM-32 on 2026-10-24. The live gateway published a V1
 state with `verification: "device_readback"` and matching retained legacy
 state. A same-value absolute power command received a successful ACK and

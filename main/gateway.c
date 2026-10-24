@@ -163,7 +163,8 @@ static void worker(void *arg)
     (void)arg;
     for (;;) {
         gateway_command_t cmd;
-        if (xQueueReceive(commands, &cmd, pdMS_TO_TICKS(15000)) != pdTRUE) {
+        // Always Ready: lower idle traffic; each command still verifies immediately.
+        if (xQueueReceive(commands, &cmd, pdMS_TO_TICKS(30000)) != pdTRUE) {
             publish_state(true, NULL, NULL, NULL);
             continue;
         }
