@@ -24,6 +24,35 @@ Replace `<prefix>` with the same prefix on both devices. The example prefix belo
 | Command | `home/smartled/strip/set` | `state`, `power 0`, `power 1`, `brightness 1..100`, `temperature 2700..6500` |
 | State | `home/smartled/strip/state` | JSON described below |
 
+The V1 interface is available in parallel with these legacy topics. Keep the
+legacy topics until the new firmware is verified against the physical light.
+
+| Purpose | Topic | Retained |
+| --- | --- | --- |
+| Absolute command | `xknob/v1/light/main/set` | No |
+| Command result | `xknob/v1/light/main/ack` | No |
+| BLE readback | `xknob/v1/light/main/state` | Yes |
+| Gateway availability | `xknob/v1/light/main/availability` | Yes |
+
+Example command:
+
+```json
+{"v":1,"command_id":"knob-1234","desired":{"power":true,"brightness_percent":52,"color_temperature_kelvin":4200}}
+```
+
+At least one desired field is required. IDs contain letters, digits, `-` or
+`_` and are at most 63 characters. Brightness is 1..100 and temperature is
+2700..6500 K. A duplicate successful command ID is acknowledged without
+repeating the BLE write; clients should use a new ID for a genuinely new
+command. A command's publish receipt is not proof of execution.
+
+The ACK includes `command_id`, `success`, and `ack_stage`. Success means the
+gateway read back every requested field and found a match. The retained state
+includes the readback values, `verification: "device_readback"`, `ok`, and
+`last_command_id` when a command was processed. Queue overflow and BLE failures
+produce a failure ACK. `availability` is `online`/`offline` via MQTT last will;
+physical BLE availability is reported separately in state.
+
 Commands are plain text and are not retained. State is retained by the gateway. Example shape:
 
 ```json
@@ -34,7 +63,32 @@ Commands are plain text and are not retained. State is retained by the gateway. 
 
 ## X-Knob interaction
 
-Open **Smart LED** from the knob menu. Turn to adjust brightness or color temperature; short-press to cycle brightness → temperature → power. Long-press returns to the previous screen. The display shows the local preview and whether the gateway confirmed it. The motor uses bounded detents for brightness and temperature and two strong positions for power.
+The V4.8 face is the knob's default page. Rotate for brightness, hold the
+button while rotating for color temperature, short-press for power, long-press
+for local scene selection, and double-click for the application menu. Scene
+selection is a preview until a short press applies it. The older **Smart LED**
+page remains in the menu during migration.
+
+The V1 gateway protocol passed an ESP-IDF 6.0.1 build and was flashed to the
+confirmed 4 MB ESP32-WROOM-32 on 2026-10-24. The live gateway published a V1
+state with `verification: "device_readback"` and matching retained legacy
+state. A same-value absolute power command received a successful ACK and
+matching BLE readback. The same command ID was acknowledged as a duplicate;
+an out-of-range brightness was rejected; the legacy `state` request still
+returned BLE readback. Brightness, color-temperature and on/off gestures from
+the physical knob need separate observation.
+
+The V1 JSON parser and 16-entry successful-command deduplication ring also
+have host tests in `tests/test_gateway_protocol.c`. Run them with
+`sh tests/run_host_tests.sh` after ESP-IDF dependencies are installed.
+
+Before flashing, confirm the serial port belongs to the intended WROOM-32.
+Keep a full 4 MB Flash backup outside Git because it contains private device
+configuration. `idf.py -p PORT -b 115200 flash` writes the bootloader, partition
+table and application without a full-chip erase. To restore the prior image,
+confirm the same board and use `python -m esptool --chip esp32 --port PORT
+write-flash 0 PRIVATE_FULLFLASH_BACKUP.bin`. Do not publish the backup or raw
+serial/MQTT captures.
 
 ## Troubleshooting
 
